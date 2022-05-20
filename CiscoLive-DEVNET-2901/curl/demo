@@ -1,0 +1,88 @@
+List all cloud agents:
+----------------------
+curl -s https://api.thousandeyes.com/v6/agents.json\?agentTypes=CLOUD \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.agents[] | "\(.agentId) \(.agentName)"'
+
+curl -s https://api.thousandeyes.com/v6/agents.json\?agentTypes=CLOUD \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.agents[] | select(.agentName | contains("London")) | "\(.agentId) \(.agentName)"'
+
+
+List all enterprise agents:
+---------------------------
+curl -s https://api.thousandeyes.com/v6/agents.json\?agentTypes=ENTERPRISE \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.agents[] | "\(.agentId) \(.agentName)"'
+
+curl -s https://api.thousandeyes.com/v6/agents.json\?agentTypes=ENTERPRISE \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.agents[] | select(.agentName | contains("CiscoLive")) | "\(.agentId) \(.agentName)"'
+
+
+List all endpoint agents:
+-------------------------
+curl -s https://api.thousandeyes.com/v6/endpoint-agents.json \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.endpointAgents[] | "\(.agentId) \(.agentName)"' 
+
+
+Disable endpoint agent:
+-----------------------
+curl -s https://api.thousandeyes.com/v6/endpoint-agents/4a0880c3-77e8-4b8c-9722-93671d573d18/disable.json \
+  -d '' \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.endpointAgents[] | "\(.status)"'
+
+
+Enable endpoint agent:
+----------------------
+curl -s https://api.thousandeyes.com/v6/endpoint-agents/4a0880c3-77e8-4b8c-9722-93671d573d18/disable.json \
+  -d '' \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.endpointAgents[] | "\(.status)"'
+
+
+Configure Agent2Agent Test:
+---------------------------
+curl -s https://api.thousandeyes.com/v6/tests/agent-to-agent/new.json \
+  -d '{ "interval": 600,
+           "agents": [
+             {"agentId": 56250}
+           ],
+           "targetAgentId": 56286,
+           "testName": "AWS eu-west-2 -- AWS us-east-1",
+           "alertsEnabled": 0
+         }' \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.test[] | "\(.testId)"'
+
+
+Configure Agent2Server Test:
+---------------------------
+curl -s https://api.thousandeyes.com/v6/tests/agent-to-server/new.json \
+  -d '{ "interval": 300,
+        "agents": [
+          {"agentId": 56250}
+        ],
+        "testName": "API agent-to-server test addition for www.thousandeyes.com",
+        "server": "www.thousandeyes.com",
+        "port": 80,
+        "alertsEnabled": 0
+      }' \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.test[] | "\(.testId)"' 
+
+
+Configure PageLoad Test:
+---------------------------
+curl -s https://api.thousandeyes.com/v6/tests/page-load/new.json \
+  -d '{ "interval": 600,
+           "agents": [
+             {"agentId": 56250}
+           ],
+           "targetAgentId": 56286,
+           "testName": "AWS eu-west-2 -- AWS us-east-1",
+           "alertsEnabled": 0
+         }' \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.test[] | "\(.testId)"'
+
+
+
