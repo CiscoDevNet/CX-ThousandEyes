@@ -1,39 +1,54 @@
+
+Account Groups:
+----------------------
+curl https://api.thousandeyes.com/v6/account-groups.json \
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.accountGroups[] | "\(.accountGroupName) - \(.aid)"'
+
+
+
 List all cloud agents:
 ----------------------
 curl -s https://api.thousandeyes.com/v6/agents.json\?agentTypes=CLOUD \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.agents[] | "\(.agentId) \(.agentName)"'
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.agents[] | "\(.agentId) - \(.agentName) - \(.countryId)"'
+
 
 curl -s https://api.thousandeyes.com/v6/agents.json\?agentTypes=CLOUD \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.agents[] | select(.agentName | contains("London")) | "\(.agentId) \(.agentName)"'
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.agents[] | select(.agentName | contains("Miami")) | "\(.agentId) - \(.agentName) - \(.countryId)"'
+
 
 
 List all enterprise agents:
 ---------------------------
 curl -s https://api.thousandeyes.com/v6/agents.json\?agentTypes=ENTERPRISE \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.agents[] | "\(.agentId) \(.agentName)"'
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.agents[] | "\(.agentId) - \(.agentName) - \(.countryId)"'
 
 curl -s https://api.thousandeyes.com/v6/agents.json\?agentTypes=ENTERPRISE \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.agents[] | select(.agentName | contains("CiscoLive")) | "\(.agentId) \(.agentName)"'
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.agents[] | select(.agentName | contains("rPi")) | "\(.agentId) - \(.agentName) - \(.countryId)"'
+
 
 
 List all endpoint agents:
 -------------------------
 curl -s https://api.thousandeyes.com/v6/endpoint-agents.json \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.endpointAgents[] | "\(.agentId) \(.agentName)"' 
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.endpointAgents[] | "\(.agentId) - \(.agentName) - \(.status) - \(.location)"'
+
 
 
 Disable endpoint agent:
 -----------------------
-curl -s https://api.thousandeyes.com/v6/endpoint-agents/4a0880c3-77e8-4b8c-9722-93671d573d18/disable.json \
+curl -s https://api.thousandeyes.com/v6/endpoint-agents/96dede60-aac2-4e4f-8ff1-ca58797604ce/disable.json \
   -d '' \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.endpointAgents[] | "\(.status)"'
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.endpointAgents[] | "\(.agentId) - \(.agentName) - \(.status)"'
+
 
 
 Enable endpoint agent:
 ----------------------
-curl -s https://api.thousandeyes.com/v6/endpoint-agents/4a0880c3-77e8-4b8c-9722-93671d573d18/disable.json \
+curl -s https://api.thousandeyes.com/v6/endpoint-agents/96dede60-aac2-4e4f-8ff1-ca58797604ce/enable.json \
   -d '' \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.endpointAgents[] | "\(.status)"'
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.endpointAgents[] | "\(.agentId) - \(.agentName) - \(.status)"'
+
+
 
 
 Configure Agent2Agent Test:
@@ -41,48 +56,63 @@ Configure Agent2Agent Test:
 curl -s https://api.thousandeyes.com/v6/tests/agent-to-agent/new.json \
   -d '{ "interval": 600,
            "agents": [
-             {"agentId": 56250}
+             {"agentId": 407971}
            ],
-           "targetAgentId": 56286,
-           "testName": "AWS eu-west-2 -- AWS us-east-1",
+           "targetAgentId": 4589,
+           "testName": "edwin-rPi_PE -- Miami_US",
            "alertsEnabled": 0
          }' \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.test[] | "\(.testId)"'
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.test[] | "\(.testId)"'
 
 
-Configure Agent2Server Test:
+
+
+Configure HTTP Server Test:
 ---------------------------
-curl -s https://api.thousandeyes.com/v6/tests/agent-to-server/new.json \
+curl -s https://api.thousandeyes.com/v6/tests/http-server/new.json \
   -d '{ "interval": 300,
         "agents": [
-          {"agentId": 56250}
+          {"agentId": 407971}
         ],
-        "testName": "API agent-to-server test addition for www.thousandeyes.com",
-        "server": "www.thousandeyes.com",
-        "port": 80,
+        "testName": "edwin-rPi_PE -- www.ciscolive.com",
+        "url": "https://www.ciscolive.com",
+        "bgpMeasurements":1, 
         "alertsEnabled": 0
       }' \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.test[] | "\(.testId)"' 
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.test[] | "\(.testId)"' 
 
 
-Configure PageLoad Test:
----------------------------
+
+Configure Page Load Test:
+-------------------------
 curl -s https://api.thousandeyes.com/v6/tests/page-load/new.json \
   -d '{ "interval": 600,
            "agents": [
-             {"agentId": 56250}
+             {"agentId": 4589}
            ],
-           "targetAgentId": 56286,
-           "testName": "AWS eu-west-2 -- AWS us-east-1",
+           "url": "https://www.ciscolive.com",
+           "testName": "Miami_US -- www.ciscolive.com",
+           "httpInterval": 120,
+           "interval": 120,
+           "bgpMeasurements":1, 
            "alertsEnabled": 0
          }' \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
-  -u ymeloch@cisco.com:qbd5kdi3ys5cjvsglzjcz8jkqg1cnb1h | jq '.test[] | "\(.testId)"'
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.test[] | "\(.testId)"'
+
+
+
+List all Tests:
+-------------------------
+curl https://api.thousandeyes.com/v6/tests.json \
+  -u edwsalaz@cisco.com:aou7v8xjtfk0aihzyf3l8utcgdesa66p | jq '.test[] | "\(.testId) - \(.type) -  \(.testName) - \(.enabled)"'
+
+
 
 
 
