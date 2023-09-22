@@ -1,0 +1,140 @@
+[
+    {
+        "id": "10d079b25f61a391",
+        "type": "tab",
+        "label": "Change TE Test Interval",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "02863139b9fa15c8",
+        "type": "http in",
+        "z": "10d079b25f61a391",
+        "name": "Webhook (/int)",
+        "url": "/int",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [
+                "65f0a077f3b1e3db"
+            ]
+        ]
+    },
+    {
+        "id": "65f0a077f3b1e3db",
+        "type": "node-red-contrib-basicauth",
+        "z": "10d079b25f61a391",
+        "name": "HTTP Auth",
+        "realm": "",
+        "username": "API_USER",
+        "password": "API_PASSWORD",
+        "x": 370,
+        "y": 200,
+        "wires": [
+            [
+                "2d051183bf798cdb",
+                "3e0fda16028f2261"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "2d051183bf798cdb",
+        "type": "http response",
+        "z": "10d079b25f61a391",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 560,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "3e0fda16028f2261",
+        "type": "function",
+        "z": "10d079b25f61a391",
+        "name": "Set API Data",
+        "func": "flow.set(\"notification\", msg.payload);\n\nconst accountId = msg.payload.alert.aid;\nconst testId = msg.payload.alert.test.id;\nconst testType = msg.payload.alert.test.type;\nconst notificationType = msg.payload.type;\nlet testInterval;\n\nswitch(notificationType) {\n    case 1: // Alert Cleared\n        testInterval = msg.payload.alert.test.intervalWhenCleared;\n        break;\n    case 2: // Alert Triggered\n        testInterval = msg.payload.alert.test.intervalWhenTriggered;\n        break;\n}\n\nflow.set(\"testInterval\", testInterval);\n\nmsg.url = `https://api.thousandeyes.com/v6/tests/${testType}/${testId}/update.json?aid=${accountId}`;\nmsg.payload  = {\n    interval: testInterval\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 200,
+        "wires": [
+            [
+                "d51c7266452a3343"
+            ]
+        ]
+    },
+    {
+        "id": "d51c7266452a3343",
+        "type": "http request",
+        "z": "10d079b25f61a391",
+        "name": "TEyes API request",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "body",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 770,
+        "y": 200,
+        "wires": [
+            [
+                "4f16fa77de647968"
+            ]
+        ]
+    },
+    {
+        "id": "5df0c17701b3dd0e",
+        "type": "http request",
+        "z": "10d079b25f61a391",
+        "name": "Send Notification",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://hooks.slack.com/services/FULL_SLACK_URL",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1170,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4f16fa77de647968",
+        "type": "function",
+        "z": "10d079b25f61a391",
+        "name": "Set Message",
+        "func": "const notification = flow.get(\"notification\");\nconst testInterval = Math.floor(flow.get(\"testInterval\")/60);\n\nconst testName = notification.alert.test.name;\nconst testId = notification.alert.test.id;\nconst accountId = notification.alert.aid;\nconst alertId = notification.alert.id;\n\nlet notificationType;\nlet alertLink = `https://app.thousandeyes.com/alerts/list/v2/?__a=${accountId}&alertId=${alertId}`;\n\nswitch(notification.type) {\n    case 1: // Alert Cleared\n        notificationType = \"Alert Cleared\";\n        alertLink = `${alertLink}&tab=history`;\n        break;\n    case 2: // Alert Triggered\n        notificationType = \"Alert Triggered\";\n        break;\n}\n\nmsg.payload = {\n    \"attachments\": [\n        {\n            \"color\": \"#00bceb\",\n            \"blocks\": [\n                {\n                    \"type\": \"section\",\n                    \"text\": {\n                        \"type\": \"mrkdwn\",\n                        \"text\": `*Test Interval Changed*\\n*Test Name:* ${testName}\\n*New Test Interval:* ${testInterval} min\\n*Change Reason:* ${notificationType} event\\n*Alert Link:* ${alertLink}`\n                    }\n                }\n            ]\n        }\n    ]\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 200,
+        "wires": [
+            [
+                "5df0c17701b3dd0e"
+            ]
+        ]
+    }
+]
